@@ -44,7 +44,7 @@ export function LoginDrawer({ trigger }: LoginDrawerProps) {
         }
 
         setLoading(true);
-        // @ts-ignore - Phone plugin types might be inferred incorrectly here
+        // @ts-ignore - Phone plugin types mighxxt be inferred incorrectly here
         await authClient.phoneNumber.sendOtp({
             phoneNumber: phoneNumber,
         }, {

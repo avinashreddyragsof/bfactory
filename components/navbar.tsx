@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import Link from "next/link";
-import { ShoppingBag, Menu } from "lucide-react";
+import { ShoppingBag, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store";
 import { LoginDrawer } from "@/components/auth/LoginDrawer";
+import { authClient } from "@/lib/auth-client";
+import profile from "@/public/profile.png"
 
 export function Navbar() {
     const { totalItems, setCartOpen } = useCartStore();
@@ -18,6 +20,9 @@ export function Navbar() {
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const { data: session } = authClient.useSession();
+    // Use isPending/data if needed, but session is usually enough for this simple switch
 
     return (
         <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -38,7 +43,17 @@ export function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <LoginDrawer />
+                    {session ? (
+                        <Link href="/profile">
+                            <Button variant="ghost" size="icon" className="rounded-full">
+                                {/* <User className="h-5 w-5" /> */}
+                                <Image src="/profile.png" alt="Profile" width={32} height={32} />
+                                <span className="sr-only">Profile</span>
+                            </Button>
+                        </Link>
+                    ) : (
+                        <LoginDrawer />
+                    )}
                     <Button
                         variant="outline"
                         size="icon"

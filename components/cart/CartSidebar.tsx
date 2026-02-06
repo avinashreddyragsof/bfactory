@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useCartStore } from "@/lib/store";
 import {
     Sheet,
@@ -11,7 +12,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area"; // Wait, I might need to install scroll-area? I will check or just use overflow-auto.
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils"; // I'll create this helper or just format inline
@@ -26,6 +28,7 @@ function formatPrice(amount: number) {
 
 export function CartSidebar() {
     const { cart, cartOpen, setCartOpen, updateQuantity, removeFromCart, totalPrice } = useCartStore();
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
 
     return (
         <Sheet open={cartOpen} onOpenChange={setCartOpen}>
@@ -105,13 +108,41 @@ export function CartSidebar() {
                                 <span>Total</span>
                                 <span>{formatPrice(totalPrice())}</span>
                             </div>
-                            <SheetClose asChild>
-                                <Link href="/checkout" passHref className="w-full">
-                                    <Button className="w-full h-12 text-base" onClick={() => setCartOpen(false)}>
-                                        Checkout
-                                    </Button>
-                                </Link>
-                            </SheetClose>
+                            <Button
+                                className="w-full h-12 text-base"
+                                onClick={async () => {
+                                    setIsCheckingOut(true);
+                                    try {
+                                        const response = await fetch("/api/orders", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                totalAmount: totalPrice(),
+                                                items: cart.map(item => ({
+                                                    menuItemId: item.itemId,
+                                                    quantity: item.quantity,
+                                                    price: item.variant.price
+                                                }))
+                                            })
+                                        });
+
+                                        if (!response.ok) throw new Error("Failed to create order");
+
+                                        const order = await response.json();
+                                        setCartOpen(false);
+                                        window.location.href = `/checkout?orderId=${order.id}`;
+                                    } catch (error) {
+                                        console.error(error);
+                                        toast.error("Failed to proceed to checkout. Please try again.");
+                                    } finally {
+                                        setIsCheckingOut(false);
+                                    }
+                                }}
+                                disabled={isCheckingOut}
+                            >
+                                {isCheckingOut && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Checkout
+                            </Button>
                         </div>
                     </>
                 )}

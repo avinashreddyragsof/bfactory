@@ -7,7 +7,7 @@ export const orders = pgTable("orders", {
     userId: text("user_id").references(() => user.id),
     status: text("status", { enum: ["pending", "confirmed", "preparing", "out_for_delivery", "delivered", "cancelled"] }).default("pending").notNull(),
     totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
-    address: text("address").notNull(),
+    address: text("address"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
@@ -15,7 +15,7 @@ export const orders = pgTable("orders", {
 export const orderItems = pgTable("order_items", {
     id: serial("id").primaryKey(),
     orderId: integer("order_id").references(() => orders.id).notNull(),
-    menuItemId: integer("menu_item_id").notNull(), // Assuming menu items have integer IDs
+    menuItemId: text("menu_item_id").notNull(),
     quantity: integer("quantity").notNull(),
     price: decimal("price", { precision: 10, scale: 2 }).notNull(),
 });
