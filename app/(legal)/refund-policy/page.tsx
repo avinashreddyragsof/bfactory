@@ -15,7 +15,7 @@ export default function RefundPolicy() {
                     <h3 className="text-lg font-semibold mb-2">Conditions for Returns</h3>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
                         <li>Due to the perishable nature of food, we generally do not accept returns.</li>
-                        <li>However, if you receive a wrong item, a damaged item, or if an item is missing, you are eligible for a refund or replacement.</li>
+                        <li>However, if you receive a wrong item, a damaged item, or if an item is missing, you are eligible for a refund.</li>
                         <li>Issues must be reported within 1 hour of delivery with photographic evidence if applicable.</li>
                     </ul>
                 </div>
